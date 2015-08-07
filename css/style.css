@@ -1,0 +1,17 @@
+.tab-lister {
+    position: relative;
+}
+
+.contact-owner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    min-height: 250px;
+    background-color: #FFF;
+    z-index: 10;
+    text-align: left;
+}
+.contact-owner input[type="submit"] {
+    background-color: #E9E9E9;
+}
