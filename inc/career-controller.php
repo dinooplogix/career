@@ -11,6 +11,8 @@ class CR_Controller {
 
         $cr_meta = array('cr_location', 'cr_position', 'cr_category');
 
+        $box = array();
+
         foreach ($_POST as $key => $value) {
 
             $trimmed_value = trim($_POST[$key]);
@@ -21,11 +23,11 @@ class CR_Controller {
         }
 
         if (count($box) == 3) {
-            $col = array_intersect($box[0], $box[1], $box[3]);
+            $col = array_intersect($box[0], $box[1], $box[2]);
         } elseif (count($box) == 2) {
             $col = array_intersect($box[0], $box[1]);
         } else {
-            $col = $box[0];
+            $col = (isset($box[0])) ? $box[0] : array();
         }
 
 

@@ -44,11 +44,15 @@ class CR_View extends CR_Controller {
     }
 
     function display_form($form_action, $form_nonce_field) {
+        $cr_location = $cr_position = $cr_category = '';
+        if (isset($_POST[$form_nonce_field]) && wp_verify_nonce($_POST[$form_nonce_field], $form_action)) {
+            extract($_POST);
+        }
         ?>
         <form action="" method="post" >
-            <label>Location: <input type="text" name="cr_location"></label>
-            <label>Position: <input type="text" name="cr_position"></label>
-            <label>Category: <input type="text" name="cr_category"></label>
+            <label>Location: <input type="text" name="cr_location" value="<?php echo $cr_location; ?>"></label>
+            <label>Position: <input type="text" name="cr_position" value="<?php echo $cr_position; ?>"></label>
+            <label>Category: <input type="text" name="cr_category" value="<?php echo $cr_category; ?>"></label>
             <?php wp_nonce_field($form_action, $form_nonce_field); ?>
             <input type="submit" value="submit">
         </form>
