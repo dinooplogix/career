@@ -1,4 +1,40 @@
 <?php
+
+
+register_activation_hook(__FILE__, 'cr_on_active');
+
+function cr_on_active() {
+    
+}
+
+
+
+add_action('wp_enqueue_scripts', 'cr_load_scripts');
+
+function cr_load_scripts() {
+    wp_enqueue_style('cr-style', CR_PLUGIN_URL . 'css/style.css');
+    wp_enqueue_style('cr-style-datatables', '//cdn.datatables.net/1.10.7/css/jquery.dataTables.min.css');
+    wp_enqueue_script('cr-script-datatables', '//cdn.datatables.net/1.10.7/css/jquery.dataTables.min.css', array('jquery'), '1.0.0');
+    
+}
+/**
+ * 
+ * 
+add_action('wp_footer', 'cr_print_footer');
+function cr_print_footer() {
+    ?>
+    <script>
+        jQuery(function ($) {
+
+
+        });
+    </script>
+    <?php
+}
+
+ */
+
+
 add_action('init', 'cpu_add_career_post_type', 0);
 
 function cpu_add_career_post_type() {
@@ -129,8 +165,34 @@ add_action('save_post', 'cr_career_save_meta_box_data');
 
 
 
-add_shortcode('cr_testcode', 'cr_testcode_execute');
+add_shortcode('cr-career', 'cr_testcode_execute');
 
 function cr_testcode_execute() {
-    return 'testing...';
+    $crObj = new CR_View();
+    $crObj->page_init_action();
 }
+
+/*
+SELECT
+A.`meta_value` AS 'cr_location',
+B.`meta_value` AS 'cr_position',
+C.`meta_value` AS 'cr_category'
+				
+FROM
+`wp_postmeta` A,
+`wp_postmeta` B,
+`wp_postmeta` C,
+				
+WHERE
+A.`post_id` = B.`post_id` AND
+A.`post_id` = C.`post_id` AND
+
+				
+A.`meta_key` = 'cr_location' AND
+B.`meta_key` = 'cr_position' AND
+C.`meta_key` = 'cr_category' AND
+ 
+A.`meta_value` = 'california' AND
+B.`meta_value` = 'california' AND
+C.`meta_value` = 'california' 
+*/
