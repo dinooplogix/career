@@ -40,4 +40,10 @@ class CR_Controller {
         return $col;
     }
 
+    function get_job_permalink($postid) {
+        $post = get_post($postid);
+        $slug = $post->post_name;
+        return site_url() . '/careers/jobs/' . $slug;
+    }
+    
 }

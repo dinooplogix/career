@@ -29,7 +29,7 @@ class CR_View extends CR_Controller {
                 <?php foreach ($col as $key => $post_id): ?>
                     <tr>
                         <td><?php echo $post_id; ?></td>
-                        <td><?php echo get_the_title($post_id); ?></td>
+                        <td><a href="<?php echo $this->get_job_permalink($post_id); ?>"><?php echo get_the_title($post_id); ?></a></td>
                         <td><?php echo get_post_meta($post_id, 'cr_location', true); ?></td>
                     </tr>
                 <?php endforeach; ?>
@@ -56,6 +56,15 @@ class CR_View extends CR_Controller {
             <?php wp_nonce_field($form_action, $form_nonce_field); ?>
             <input type="submit" value="submit">
         </form>
+        <?php
+    }
+
+    function display_job_details($postid) {
+        $post = get_post($postid);
+        ?>
+        <h2><?php echo $post->post_title; ?></h2>
+        <p><?php echo $post->post_content; ?></p>
+        <p><a href="#">Apply</a></p>
         <?php
     }
 
