@@ -1,13 +1,20 @@
 <?php
+add_action('admin_menu', 'cr_register_application_form_menu');
 
-
-register_activation_hook(__FILE__, 'cr_on_active');
-
-function cr_on_active() {
-    
+function cr_register_application_form_menu() {
+    add_submenu_page(null, 'Application', 'Application Form', 'manage_options', 'user-application', 'cr_user_application_display');
 }
 
+function cr_user_application_display() {
+    require_once CR_PLUGIN_PATH . 'display/admin-user-application.php';
+}
 
+function cgc_ub_action_links($actions, $user_object) {
+    $actions['display_applications'] = "<a href='" . admin_url("options.php?page=user-application&amp;action=display_applications&amp;user=$user_object->ID") . "'>Applications</a>";
+    return $actions;
+}
+
+add_filter('user_row_actions', 'cgc_ub_action_links', 10, 2);
 
 add_action('wp_enqueue_scripts', 'cr_load_scripts');
 
@@ -15,26 +22,24 @@ function cr_load_scripts() {
     wp_enqueue_style('cr-style', CR_PLUGIN_URL . 'css/style.css');
     wp_enqueue_style('cr-style-datatables', '//cdn.datatables.net/1.10.7/css/jquery.dataTables.min.css');
     wp_enqueue_script('cr-script-datatables', '//cdn.datatables.net/1.10.7/css/jquery.dataTables.min.css', array('jquery'), '1.0.0');
-    
 }
+
 /**
  * 
  * 
-add_action('wp_footer', 'cr_print_footer');
-function cr_print_footer() {
-    ?>
-    <script>
-        jQuery(function ($) {
+  add_action('wp_footer', 'cr_print_footer');
+  function cr_print_footer() {
+  ?>
+  <script>
+  jQuery(function ($) {
 
 
-        });
-    </script>
-    <?php
-}
+  });
+  </script>
+  <?php
+  }
 
  */
-
-
 add_action('init', 'cpu_add_career_post_type', 0);
 
 function cpu_add_career_post_type() {
@@ -162,37 +167,3 @@ function cr_career_save_meta_box_data($post_id) {
 }
 
 add_action('save_post', 'cr_career_save_meta_box_data');
-
-
-
-add_shortcode('cr-career', 'cr_testcode_execute');
-
-function cr_testcode_execute() {
-    $crObj = new CR_View();
-    $crObj->page_init_action();
-}
-
-/*
-SELECT
-A.`meta_value` AS 'cr_location',
-B.`meta_value` AS 'cr_position',
-C.`meta_value` AS 'cr_category'
-				
-FROM
-`wp_postmeta` A,
-`wp_postmeta` B,
-`wp_postmeta` C,
-				
-WHERE
-A.`post_id` = B.`post_id` AND
-A.`post_id` = C.`post_id` AND
-
-				
-A.`meta_key` = 'cr_location' AND
-B.`meta_key` = 'cr_position' AND
-C.`meta_key` = 'cr_category' AND
- 
-A.`meta_value` = 'california' AND
-B.`meta_value` = 'california' AND
-C.`meta_value` = 'california' 
-*/

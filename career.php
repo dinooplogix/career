@@ -13,6 +13,12 @@
 define('CR_PLUGIN_PATH', plugin_dir_path(__FILE__));
 define('CR_PLUGIN_URL', plugin_dir_url(__FILE__));
 
+register_activation_hook(__FILE__, 'cr_on_active');
+
+function cr_on_active() {
+    add_role( 'candidate', 'Candidate', array( 'read' => true, 'level_0' => true ) );
+}
+
 require_once CR_PLUGIN_PATH . 'inc/cf-functions.php';
 require_once CR_PLUGIN_PATH . 'inc/functions.php';
 

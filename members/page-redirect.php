@@ -1,7 +1,7 @@
 <?php
 
 $virtual_page = array(
-    'forget-password' => 'Forget Password',
+    'forgot-password' => 'Forgot Password',
     'reset-password' => 'Reset Password',
     'register' => 'Register',
     'account' => 'My Account',
@@ -11,11 +11,12 @@ $virtual_page = array(
 add_action('init', 'mb_rewrite_rules');
 
 function mb_rewrite_rules() {
-    // add_rewrite_rule('^forget-password/([^/]*)/?$', 'index.php?pagename=mb-page-manager&tax_slug=$matches[1]&screen=assessment_single', 'top');
-    add_rewrite_rule('^forget-password/?$', 'index.php?pagename=mb-page-manager&screen=forget-password', 'top');
+    // add_rewrite_rule('^forgot-password/([^/]*)/?$', 'index.php?pagename=mb-page-manager&tax_slug=$matches[1]&screen=assessment_single', 'top');
+    add_rewrite_rule('^forgot-password/?$', 'index.php?pagename=mb-page-manager&screen=forgot-password', 'top');
     add_rewrite_rule('^reset-password/?$', 'index.php?pagename=mb-page-manager&screen=reset-password', 'top');
     add_rewrite_rule('^register/?$', 'index.php?pagename=mb-page-manager&screen=register-form', 'top');
     add_rewrite_rule('^account/?$', 'index.php?pagename=mb-page-manager&screen=profile-page', 'top');
+    add_rewrite_rule('^system-login/?$', 'index.php?pagename=mb-page-manager&screen=login-form', 'top');
     
     //show bare metals in dedicated page
     add_rewrite_rule('^hosting/dedicated-servers/?$', 'index.php?pagename=shop&product_cat=bare-metal-servers', 'top');
@@ -61,8 +62,8 @@ function mb_page_manager_display() {
 
     $screen = get_query_var('screen');
 
-    // example.com/forget-password
-    if ($screen == 'forget-password') {
+    // example.com/forgot-password
+    if ($screen == 'forgot-password') {
         $mbObj->display_username_enquery();
     }
 
@@ -73,11 +74,6 @@ function mb_page_manager_display() {
 
     // example.com/register
     if ($screen == 'register-form') {
-        if (is_user_logged_in()) {
-            ob_end_clean();
-            wp_safe_redirect(site_url() . "/account");
-            exit;
-        }
         $mbObj->display_register_page();
     }
 
@@ -92,6 +88,11 @@ function mb_page_manager_display() {
         } else {
             $mbObj->display_account_page($user_id);
         }
+    }
+    
+    //example.com/system-login
+    if($screen == 'login-form'){
+        $mbObj->display_login_fom();
     }
 }
 

@@ -5,23 +5,12 @@
     </div>
     <form action="" method="POST" name="rpue">
        
-        <div class="col-md-6">
-            <div class="form-group">
-                <input type="text" name="user_login" value="" placeholder="Username" class="form-control" />            
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="form-group">
-                <input type="email" name="user_email" value="" placeholder="Email" class="form-control" />
-            </div>
-        </div>
+        <p><input type="text" name="user_login" value="" placeholder="Username" class="form-control" /></p>
+        <p><input type="email" name="user_email" value="" placeholder="Email" class="form-control" /></p>
 
         <?php wp_nonce_field($form_action, $form_nonce_field); ?>
-        <div class="form-group">
-            <div class="col-md-6">
-                <button type="submit" class="btn btn-default">Reset</button>
-            </div>
-        </div>
+        <p><button type="submit" class="btn btn-default">Reset</button></p>
+        
         
     </form>
 

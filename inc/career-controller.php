@@ -45,5 +45,11 @@ class CR_Controller {
         $slug = $post->post_name;
         return site_url() . '/careers/jobs/' . $slug;
     }
-    
+
+    function get_user_submitted_forms($user_id) {
+        global $wpdb;
+        $result = $wpdb->get_col($wpdb->prepare("SELECT meta_key FROM $wpdb->usermeta WHERE user_id = %d AND meta_key LIKE %s", $user_id, '%cr_application_form_%'));
+        return $result;
+    }
+
 }

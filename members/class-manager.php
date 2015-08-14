@@ -6,13 +6,23 @@ class MB_Manager {
     private $url_param_alias_salt = "";
     private $message = "";
     private $html_display_path;
+    private $site_url;
+    private $current_user_id;
 
     function __construct() {
         $this->url_param_alias_user_identifier = "bin";
         $this->url_param_alias_salt = "mblo";
-        $this->reset_link = site_url() . "/reset-password";
+        $this->site_url = site_url() . '/';
+        $this->reset_link = $this->site_url . "reset-password";
         $this->html_display_path = MB_PLUGIN_PATH . 'display/';
-        $this->redirect_after_register = site_url() . "/account";
+
+
+        $this->account_url = $this->site_url . "account";
+        $this->register_form_url = $this->site_url . "register";
+        $this->forgot_password_form_url = $this->site_url . "forgot-password";
+        $this->login_form_url = $this->site_url . "system-login";
+
+        $this->current_user_id = get_current_user_id();
     }
 
     /**
@@ -204,8 +214,6 @@ class MB_Manager {
      */
     function submit_register_form($post) {
 
-
-
         extract($post, EXTR_OVERWRITE);
 
         //$user_pass = $first_name;
@@ -223,6 +231,7 @@ class MB_Manager {
                 'ID' => $user_id,
                 'user_pass' => $user_pass,
                 'user_email' => $user_email,
+                'role' => 'candidate'
             );
 
             wp_update_user($userdata);
@@ -235,11 +244,11 @@ class MB_Manager {
                         add_user_meta($user_id, $key, $mata_value, true);
                 }
             }
-            
-            $this->message .= apply_filters("user_added_successfully", $user_id);
+
+            //$this->message .= apply_filters("user_added_successfully", $user_id);
+            $this->message = "Registered successfully";
 
             cf_display_front_messages('success', $this->message);
-            
         } else {
 
             cf_display_front_messages('warning', 'User already exists.');
@@ -254,32 +263,26 @@ class MB_Manager {
 
         extract($post, EXTR_OVERWRITE);
 
+        $user_info = get_user_by('id', $user_id);
+        $user_email = $user_info->user_email;
 
-        $user_info = get_userdata($user_id);
+        $userdata = array(
+            'ID' => $user_id,
+            'user_pass' => $user_pass,
+        );
 
-        if ($user_info->data->user_email == $user_email || email_exists($user_email) == false) {
+        wp_update_user($userdata);
 
-            $userdata = array(
-                'ID' => $user_id,
-                'user_pass' => $user_pass,
-                'user_email' => $user_email,
-            );
+        $user_meta_data = array();
 
-            wp_update_user($userdata);
-
-            $user_meta_data = array();
-
-            if (!empty($user_meta_data)) {
-                foreach ($post as $key => $mata_value) {
-                    if (!array_key_exists($key, $user_meta_data))
-                        add_user_meta($user_id, $key, $mata_value, true);
-                }
+        if (!empty($user_meta_data)) {
+            foreach ($post as $key => $mata_value) {
+                if (!array_key_exists($key, $user_meta_data))
+                    add_user_meta($user_id, $key, $mata_value, true);
             }
-
-            cf_display_front_messages('success', 'User editted successfully');
-        }else {
-            cf_display_front_messages('warning', 'Found error in updation');
         }
+
+        cf_display_front_messages('success', 'User editted successfully');
     }
 
     function set_register_form_values($user_id = null) {
@@ -294,27 +297,33 @@ class MB_Manager {
         } else {
             $return = array(
                 "user_email" => $user->user_email,
-                "user_pass" => $user->confirm_password,
-                "confirm_password" => $user->confirm_password,
+                "user_pass" => '',
+                "confirm_password" => '',
             );
         }
         return $return;
     }
 
     function display_register_page() {
+        
+        if ($this->current_user_id) {
+            ob_end_clean();
+            wp_safe_redirect($this->account_url);
+            exit;
+        }
 
         // Submit my account
         if (isset($_POST['add_new_user_nonce_field']) && wp_verify_nonce($_POST['add_new_user_nonce_field'], 'add_new_user')) {
             $this->submit_register_form($_POST);
             ob_end_clean();
-            wp_safe_redirect($this->redirect_after_register);
+            wp_safe_redirect($this->account_url);
             exit;
         }
 
         $form_values = $this->set_register_form_values();
         extract($form_values, EXTR_OVERWRITE);
 
-        $form_heading = "";
+        $form_heading = "Create New Login";
         $form_name = "register_form";
         $display_password = true;
         $disable_username = false;
@@ -339,10 +348,43 @@ class MB_Manager {
         $form_name = "register_form";
         $display_password = true;
         $disable_username = true;
+        $disable_login_button= true;
         $form_action = 'edit_profile';
         $form_nonce_field = 'edit_profile_nonce_field';
 
         include $this->html_display_path . 'form-register.php';
+    }
+
+    function display_login_fom() {
+
+        if ($this->current_user_id) {
+            //If user already logged in
+            ob_end_clean();
+            wp_safe_redirect($this->account_url);
+            exit;
+        }
+
+        $form_action = 'user_login_form';
+        $form_nonce_field = 'user_login_form_nonce_field';
+
+        if (isset($_POST[$form_nonce_field]) && wp_verify_nonce($_POST[$form_nonce_field], $form_action)) {
+            $user = get_user_by('login', $_POST['user_login']);
+
+            $pass = $_POST['user_pass'];
+            if ($user && wp_check_password($pass, $user->data->user_pass, $user->ID)) {
+
+                wp_set_current_user($user->ID, $user->user_login);
+                wp_set_auth_cookie($user->ID);
+                do_action('wp_login', $user->user_login);
+                ob_end_clean();
+                wp_safe_redirect($this->account_url);
+                exit;
+            } else {
+                cf_display_front_messages("danger", "ERROR: The password or username is incorrect.");
+            }
+        }
+
+        include $this->html_display_path . 'form-login.php';
     }
 
     function form_changer() {
@@ -358,7 +400,6 @@ class MB_Manager {
         }
 
         if ($basename == 'edit-user') {
-
             //Check user capebility to edit
             $user_form_values = $this->set_register_form_values($_GET['user_id']);
         }
