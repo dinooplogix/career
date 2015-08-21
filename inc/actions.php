@@ -20,8 +20,12 @@ add_action('wp_enqueue_scripts', 'cr_load_scripts');
 
 function cr_load_scripts() {
     wp_enqueue_style('cr-style', CR_PLUGIN_URL . 'css/style.css');
-    wp_enqueue_style('cr-style-datatables', '//cdn.datatables.net/1.10.7/css/jquery.dataTables.min.css');
-    wp_enqueue_script('cr-script-datatables', '//cdn.datatables.net/1.10.7/css/jquery.dataTables.min.css', array('jquery'), '1.0.0');
+
+    wp_enqueue_style('style-datatables', CR_PLUGIN_URL . 'data-table/jquery.dataTables.css');
+    wp_enqueue_script('script-datatables', CR_PLUGIN_URL . 'data-table/jquery.dataTables.js', array('jquery'), '1.0.0');
+
+    wp_enqueue_script('script-application-form', CR_PLUGIN_URL . 'js/application-form-script.js', array('jquery'), '1.0.0');
+
 }
 
 /**
@@ -40,9 +44,9 @@ function cr_load_scripts() {
   }
 
  */
-add_action('init', 'cpu_add_career_post_type', 0);
+add_action('init', 'cr_add_career_post_type', 0);
 
-function cpu_add_career_post_type() {
+function cr_add_career_post_type() {
 
     $labels = array(
         'name' => _x('Careers', 'Post Type General Name', 'cr_domain'),
@@ -87,9 +91,9 @@ function cpu_add_career_post_type() {
  * 
  * Define a category for career
  */
-add_action('init', 'cpu_career_taxonomy');
+add_action('init', 'cr_career_taxonomy');
 
-function cpu_career_taxonomy() {
+function cr_career_taxonomy() {
 
     $labels = array(
         'name' => _x('Career Categories', 'taxonomy general name'),
@@ -114,7 +118,7 @@ function cpu_career_taxonomy() {
         'rewrite' => array('slug' => 'career-category'),
     );
 
-    register_taxonomy('career_category', array('careers'), $args);
+    register_taxonomy('career_category', array('career'), $args);
 }
 
 // Career metabox --------------------------------------------------------------
@@ -149,6 +153,12 @@ function cr_career_meta_box_callback($post) {
                        value="<?php echo esc_attr(get_post_meta($post->ID, 'cr_category', true)); ?>"></td>
 
         </tr>
+        <tr>
+            <td><label for="cr_question_categories">Question Categories</label></td>
+            <td><input type="text" id="cr_question_categories" name="cr_question_categories" 
+                       value="<?php echo esc_attr(get_post_meta($post->ID, 'cr_question_categories', true)); ?>"></td>
+
+        </tr>
     </table>
     <?php
 }
@@ -158,7 +168,7 @@ function cr_career_save_meta_box_data($post_id) {
         return;
     }
 
-    $cr_meta = array('cr_location', 'cr_position', 'cr_category');
+    $cr_meta = array('cr_location', 'cr_position', 'cr_category', 'cr_question_categories');
     foreach ($_POST as $key => $value) {
         if (in_array($key, $cr_meta)) {
             update_post_meta($post_id, $key, $value);
@@ -167,3 +177,83 @@ function cr_career_save_meta_box_data($post_id) {
 }
 
 add_action('save_post', 'cr_career_save_meta_box_data');
+
+
+// Question
+
+add_action('init', 'cr_add_question_post_type', 0);
+
+function cr_add_question_post_type() {
+
+    $labels = array(
+        'name' => _x('Questions', 'Post Type General Name', 'cr_career'),
+        'singular_name' => _x('Question', 'Post Type Singular Name', 'cr_career'),
+        'menu_name' => __('Questions', 'cr_career'),
+        'parent_item_colon' => __('Parent Question', 'cr_career'),
+        'all_items' => __('All Questions', 'cr_career'),
+        'view_item' => __('View Question', 'cr_career'),
+        'add_new_item' => __('Add New Question', 'cr_career'),
+        'add_new' => __('Add New', 'cr_career'),
+        'edit_item' => __('Edit Question', 'cr_career'),
+        'update_item' => __('Update Question', 'cr_career'),
+        'search_items' => __('Search Question', 'cr_career'),
+        'not_found' => __('Not Found', 'cr_career'),
+        'not_found_in_trash' => __('Not found in Trash', 'cr_career'),
+    );
+
+    $args = array(
+        'label' => __('questions', 'cr_career'),
+        'description' => __('Question in Noodle Factory', 'cr_career'),
+        'labels' => $labels,
+        'supports' => array('title', 'editor', 'excerpt', 'thumbnail'),
+        'taxonomies' => array('genres'),
+        'hierarchical' => false,
+        'public' => true,
+        'show_ui' => true,
+        'show_in_menu' => true,
+        'show_in_nav_menus' => true,
+        'show_in_admin_bar' => true,
+        'menu_position' => 5,
+        'can_export' => true,
+        'has_archive' => true,
+        'exclude_from_search' => false,
+        'publicly_queryable' => true,
+        'capability_type' => 'page',
+    );
+
+    register_post_type('question', $args);
+}
+
+/**
+ * 
+ * Define a category for question
+ */
+add_action('init', 'cr_question_taxonomy');
+
+function cr_question_taxonomy() {
+
+    $labels = array(
+        'name' => _x('Question Categories', 'taxonomy general name'),
+        'singular_name' => _x('Question Category', 'taxonomy singular name'),
+        'search_items' => __('Search Category'),
+        'all_items' => __('All Categories'),
+        'parent_item' => __('Parent Category'),
+        'parent_item_colon' => __('Parent Category:'),
+        'edit_item' => __('Edit Category'),
+        'update_item' => __('Update Category'),
+        'add_new_item' => __('Add New Category'),
+        'new_item_name' => __('New Category Name'),
+        'menu_name' => __('Question Categories'),
+    );
+
+    $args = array(
+        'hierarchical' => true,
+        'labels' => $labels,
+        'show_ui' => true,
+        'show_admin_column' => true,
+        'query_var' => true,
+        'rewrite' => array('slug' => 'question-category'),
+    );
+
+    register_taxonomy('question_category', array('question'), $args);
+}

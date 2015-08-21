@@ -117,3 +117,4 @@ function mb_wp_title($title, $sep) {
 }
 
 add_filter('wp_title', 'mb_wp_title', 10, 2);
+

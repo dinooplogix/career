@@ -6,15 +6,24 @@
 
     $crObj = new CR_View();
     $application = $crObj->get_user_submitted_forms($user_id);
+
     if (!empty($application)) {
         $application = get_user_meta($user_id, $application[0], true);
     } else {
-        echo '<p>No application were found</p>';
+        echo '<p>No applications were found</p>';
         return false;
     }
     ?>
     <table class="form-table">
         <tbody>
+            <tr>
+                <th>Resume</th>
+                <td><a href="<?php echo wp_get_attachment_url($application['resume']); ?>" target="_blank">Download</a></td>
+            </tr>
+            <tr>
+                <th>Cover Letter</th>
+                <td><a href="<?php echo wp_get_attachment_url($application['cover_letter']); ?>" target="_blank">Download</a></td>
+            </tr>
             <tr>
                 <th>First Name</th>
                 <td><?php echo $application['applicant_name']; ?></td>
@@ -53,7 +62,6 @@
             </tr>
             <tr>
                 <th colspan="2"><h4>Optional EEO and Background Information</h4></th>
-        <td></td>
         </tr>
         <tr>
             <th>Gender</th>
@@ -70,6 +78,17 @@
         <tr>
             <th>Are you a U.S. Veteran?</th>
             <td><?php echo $application['us_veteran']; ?></td>
+        </tr>
+
+        <tr>
+            <th>Other questions</th>
+            <td><?php
+    $question_paper = $crObj->get_refined_question_answers($application, $user_id);
+    foreach ($question_paper as $qa) {
+        echo '<p><strong> Q: ' . $qa['question'] . '</strong></p>';
+        echo '<p>' . $qa['answer'] . '</p>';
+    }
+    ?></td>
         </tr>
 
         </tbody>

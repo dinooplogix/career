@@ -1,4 +1,4 @@
-<select name="country" required>
+<select name="country">
     <option value="">--Select--</option>
     <option value="Afghanistan">Afghanistan</option>
     <option value="Albania">Albania</option>

@@ -1,4 +1,29 @@
 <?php
+function cf_get_customposts_by_terms($display_count, $post_type, $terms) {
+    $page = get_query_var('paged') ? get_query_var('paged') : 1;
+    $offset = ( $page - 1 ) * $display_count;
+
+    $args = array(
+        'post_type' => $post_type,
+        'posts_per_page' => $display_count,
+        'page' => $page,
+        'offset' => $offset,
+        'order'     => 'ASC',
+        'tax_query' => array(
+            array(
+                'taxonomy' => 'question_category',
+                'field' => 'slug',
+                'terms' => $terms
+            ),
+        ),
+    );
+    
+
+
+    $the_query = new WP_Query($args);
+    return $the_query;
+}
+
 
 function cf_display_front_messages($type = null, $message = null, $echothis = null) {
     if ($echothis != null) {

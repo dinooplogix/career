@@ -1,3 +1,20 @@
 .search_form {
     margin: 15px 0px;
 }
+
+.job-table-list {
+    margin-top: 40px;
+    margin-bottom: 40px;
+}
+
+/* Application form*/
+.form-parts {
+    display: none;
+}
+.form-parts:first-child {
+    display: block;
+}
+
+input[type="radio"]{
+    vertical-align: -3px;
+}

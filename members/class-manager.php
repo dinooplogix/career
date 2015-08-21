@@ -15,9 +15,11 @@ class MB_Manager {
         $this->site_url = site_url() . '/';
         $this->reset_link = $this->site_url . "reset-password";
         $this->html_display_path = MB_PLUGIN_PATH . 'display/';
-
-
-        $this->account_url = $this->site_url . "account";
+        
+        $this->career_page_url = $this->site_url . "careers/";
+        // $this->account_url = $this->site_url . "account";
+        $this->account_url = $this->career_page_url ;
+        
         $this->register_form_url = $this->site_url . "register";
         $this->forgot_password_form_url = $this->site_url . "forgot-password";
         $this->login_form_url = $this->site_url . "system-login";
